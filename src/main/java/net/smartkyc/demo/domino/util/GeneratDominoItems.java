@@ -1,7 +1,10 @@
 package net.smartkyc.demo.domino.util;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import net.smartkyc.demo.domino.model.DominoItem;
 public class GeneratDominoItems {
@@ -10,7 +13,7 @@ public class GeneratDominoItems {
 	private int max_val = 10;
 	private int numElem = 8;
 	private Random randomData = null;
-	List<DominoItem> allDominos  = null;
+	private List<DominoItem> allDominos  = null;
 	
 	GeneratDominoItems() {
 		randomData = new Random();
@@ -25,14 +28,14 @@ public class GeneratDominoItems {
 		return new DominoItem(left, right);
 	}
 	
-	public List<DominoItem> generateListDominoItem(){
+	public List<DominoItem> generateDominoItem(){
 		
 		while(!(allDominos.size() <= numElem)){
 			DominoItem dItem = getItemDominus();
 			if(!allDominos.contains(dItem)) allDominos.add(dItem);
 		}
 	
-		return allDominos;
+		return allDominos.stream().distinct().collect(Collectors.toList());
 	}
 	
 }
