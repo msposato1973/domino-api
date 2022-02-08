@@ -7,7 +7,7 @@ public class DominoItem {
 	private int left;
 	private int right;
 	
-	DominoItem(final int left, final int right) {
+	public DominoItem(final int left, final int right) {
 		super();
 		this.left = left;
 		this.right = right;
