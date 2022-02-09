@@ -1,10 +1,8 @@
 package net.smartkyc.demo.domino.util;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import net.smartkyc.demo.domino.model.DominoItem;
 public class GeneratDominoItems {
