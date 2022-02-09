@@ -16,7 +16,7 @@ public class DominoService {
 
 	private static final Logger log = LoggerFactory.getLogger(DominoService.class);
 	
-	private Map<Integer, List<DominoItem>> mapRecord = new  HashMap<>();
+	private Map<Integer, List<DominoItem>> mapDominoRecord = new  HashMap<>();
 	private List<DominoItem> allRecord = new ArrayList<DominoItem>();
 	
 	public List<DominoItem> getAllRecord() {

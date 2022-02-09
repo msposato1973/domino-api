@@ -9,11 +9,18 @@ public class GeneratDominoItems {
 	
 	private int min_val = 1;
 	private int max_val = 10;
-	private int numElem = 8;
+	private int numElem = 0;
 	private Random randomData = null;
 	private List<DominoItem> allDominos  = null;
 	
 	GeneratDominoItems() {
+		numElem = 8;
+		randomData = new Random();
+		allDominos = new ArrayList<DominoItem>();
+	}
+	
+	GeneratDominoItems(int numElem) {
+		numElem = numElem ;
 		randomData = new Random();
 		allDominos = new ArrayList<DominoItem>();
 	}
