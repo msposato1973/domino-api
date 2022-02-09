@@ -22,6 +22,10 @@ public class DominoItem {
 		return this.right;
 	}
 	
+	boolean sameNumber() {
+	      return this.left == this.right;
+	}
+	
 	
 	@Override
 	public String toString() {
