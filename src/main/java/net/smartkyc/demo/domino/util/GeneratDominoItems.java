@@ -27,8 +27,8 @@ public class GeneratDominoItems {
 	
 	private DominoItem getItemDominus() {
 		 
-		int left = randomData.nextInt(min_val, max_val);
-		int right = randomData.nextInt(min_val, max_val);
+		Integer left = randomData.nextInt(max_val);
+		Integer right = randomData.nextInt(max_val);
 		
 		return new DominoItem(left, right);
 	}
@@ -40,7 +40,8 @@ public class GeneratDominoItems {
 			if(!allDominos.contains(dItem)) allDominos.add(dItem);
 		}
 	
-		return allDominos.stream().distinct().collect(Collectors.toList());
+		//return allDominos.stream().distinct().collect(Collectors.toList());
+		return allDominos;
 	}
 	
 }
