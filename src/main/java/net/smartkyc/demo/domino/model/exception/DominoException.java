@@ -1,4 +1,4 @@
-package net.smartkyc.demo.domino.service;
+package net.smartkyc.demo.domino.model.exception;
 
 public class DominoException extends Exception {
 

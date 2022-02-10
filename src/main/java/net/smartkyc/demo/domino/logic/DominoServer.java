@@ -9,13 +9,16 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import net.smartkyc.demo.domino.model.DominoItem;
 import net.smartkyc.demo.domino.model.DominoResponse;
 import net.smartkyc.demo.domino.model.ValidDominoChain;
-import net.smartkyc.demo.domino.service.DominoException;
+import net.smartkyc.demo.domino.model.exception.DominoException;
+import net.smartkyc.demo.domino.service.types.DominoService;
 
-public class DominoServer {
+@Component
+public class DominoServer implements DominoService {
 	
 	private static final Logger log = LoggerFactory.getLogger(DominoServer.class);
 
@@ -101,8 +104,11 @@ public class DominoServer {
 					
 			// Update left chain
 			endChainLeft = updateLeftChain(currentChain);
-				
+			
+			// Check if no more items can be added, neither to right nor to the left
 			if (endChainRight && endChainLeft) {
+				// If no more items can be added
+				// Update maxValueChain if current chain has a higher value than the previous one
 				if (currentChain.getValue() > maxValueChain.getValue()) {
 					LinkedList<DominoItem> newLinkedList = 
 							(LinkedList<DominoItem>) currentChain.getChain().clone();
@@ -123,25 +129,33 @@ public class DominoServer {
 		endChain[0] = true;
 		try {
 			map.get(currentChain.getLeftMost()).forEach(item -> {
-				if (!item.isVisited()) {
+				if (!item.isUsed()) {
+					// Set end chain false
 					endChain[0] = false;
+					
+					// Set current item as used
+					item.setUsed(true);
+
+					// Update current chain by adding current item to the left
 					Integer leftMost = currentChain.getLeftMost();
-					// Update current chain
 					currentChain.getChain().addFirst(item);
-					item.setVisited(true);
 					Integer newLeftMostValue = 
 							(item.getFirst().equals(leftMost)) ? 
 									item.getSecond() : item.getFirst();
-					currentChain.setRightMost(newLeftMostValue);
-					
+					currentChain.setRightMost(newLeftMostValue);			
 					currentChain.setValue(currentChain.getValue() + 
 							leftMost);
+					
 					// Recursive call
 					calculateHighestValueChain(currentChain);
-					// Update back current back
+					
+					// Set current item as unused
+					item.setUsed(false);
+					
+					// Update back current chain by removing current item from the left
 					currentChain.getChain().removeFirst();
 					currentChain.setValue(leftMost);
-					item.setVisited(false);
+					currentChain.setValue(currentChain.getValue() - leftMost);
 				}
 			});
 		} catch (RuntimeException e) {
@@ -156,26 +170,33 @@ public class DominoServer {
 		endChain[0] = true;
 		try {
 			map.get(currentChain.getRightMost()).forEach(item -> {
-				if (!item.isVisited()) {
+				if (!item.isUsed()) {
+					// Set end chain false
 					endChain[0] = false;
-					Integer rightMost = currentChain.getRightMost();
-					// Update current chain
-					currentChain.getChain().addLast(item);
-					item.setVisited(true);
 					
+					// Set current item as used
+					item.setUsed(true);		
+					
+					// Update current chain by adding current item to the right
+					Integer rightMost = currentChain.getRightMost();
+					currentChain.getChain().addLast(item);
 					Integer newRightMostValue = 
 							(item.getFirst().equals(rightMost)) ? 
 									item.getSecond() : item.getFirst();
 					currentChain.setRightMost(newRightMostValue);
-					
 					currentChain.setValue(currentChain.getValue() + 
 							rightMost);
+					
 					// Recursive call
 					calculateHighestValueChain(currentChain);
-					// Update back current back
+					
+					// Set current item as unused
+					item.setUsed(false);
+					
+					// Update back current chain by removing current item from the right
 					currentChain.getChain().removeLast();
-					currentChain.setValue(rightMost);
-					item.setVisited(false);
+					currentChain.setRightMost(rightMost);
+					currentChain.setValue(currentChain.getValue() - rightMost);
 				}
 			});
 		} catch (RuntimeException e) {

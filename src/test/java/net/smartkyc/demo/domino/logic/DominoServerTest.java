@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import net.smartkyc.demo.domino.model.DominoItem;
 import net.smartkyc.demo.domino.model.DominoResponse;
-import net.smartkyc.demo.domino.service.DominoException;
+import net.smartkyc.demo.domino.model.exception.DominoException;
 
 
 public class DominoServerTest {
