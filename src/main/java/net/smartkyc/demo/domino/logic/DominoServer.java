@@ -163,7 +163,7 @@ public class DominoServer implements DominoService {
 					Integer newLeftMostValue = 
 							(item.getFirst().equals(leftMost)) ? 
 									item.getSecond() : item.getFirst();
-					currentValidChain.setRightMost(newLeftMostValue);			
+					currentValidChain.setLeftMost(newLeftMostValue);			
 					currentValidChain.setValue(currentValidChain.getValue() + 
 							leftMost);
 					
