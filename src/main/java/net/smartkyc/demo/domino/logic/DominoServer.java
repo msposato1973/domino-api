@@ -2,6 +2,7 @@ package net.smartkyc.demo.domino.logic;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +23,15 @@ public class DominoServer implements DominoService {
 	
 	private static final Logger log = LoggerFactory.getLogger(DominoServer.class);
 
-	public static Map<Integer, Set<DominoItem>> map = 
-			new HashMap<Integer, Set<DominoItem>>();
-	
+	// Valid domino chain with highest value
 	private static ValidDominoChain maxValueChain = new ValidDominoChain();
-	
+
+	// Init domino map
+	// To each value from 1 to 10 is associated a set of domino items 
+	// Each item in the set contains the associated value either as first or second element
+	public static Map<Integer, Set<DominoItem>> dominoMap = 
+			new HashMap<Integer, Set<DominoItem>>();
+		
 	static {
 		Set<DominoItem> one = new HashSet<DominoItem>();
 		Set<DominoItem> two = new HashSet<DominoItem>();
@@ -38,53 +43,58 @@ public class DominoServer implements DominoService {
 		Set<DominoItem> eight = new HashSet<DominoItem>();
 		Set<DominoItem> nine = new HashSet<DominoItem>();
 		Set<DominoItem> ten = new HashSet<DominoItem>();
-		map.put(new Integer(1), one);
-		map.put(new Integer(2), two);
-		map.put(new Integer(3), three);
-		map.put(new Integer(4), four);
-		map.put(new Integer(5), five);
-		map.put(new Integer(6), six);
-		map.put(new Integer(7), seven);
-		map.put(new Integer(8), eight);
-		map.put(new Integer(9), nine);
-		map.put(new Integer(10), ten);	
+		dominoMap.put(new Integer(1), one);
+		dominoMap.put(new Integer(2), two);
+		dominoMap.put(new Integer(3), three);
+		dominoMap.put(new Integer(4), four);
+		dominoMap.put(new Integer(5), five);
+		dominoMap.put(new Integer(6), six);
+		dominoMap.put(new Integer(7), seven);
+		dominoMap.put(new Integer(8), eight);
+		dominoMap.put(new Integer(9), nine);
+		dominoMap.put(new Integer(10), ten);	
 	}
 	
 	public DominoResponse getHighestValueDominoChain(
 			DominoItem initialDominoItem, 
 			List<DominoItem> dominoItemList)
 			throws DominoException {
+		// Domino response
 		DominoResponse dominoResponse = null;
-		ValidDominoChain currentChain;
+		
+		// Current valid domino chain will contains all possible valid domino chains 
+		// generated from initialDominoItem and dominoItemList
+		ValidDominoChain currentValidChain;
 		
 		try {
 			// Init response
 			dominoResponse = new DominoResponse();
-			// Init domino map
+			
+			// Load domino items to domino map, without considering the initial domino item
 			dominoItemList.forEach(item -> {
 				if (!item.equals(initialDominoItem)) {
-					map.get(item.getFirst()).add(item);
-				}
-				if (!item.equals(initialDominoItem)) {
-					map.get(item.getSecond()).add(item);
+					dominoMap.get(item.getFirst()).add(item);
+					dominoMap.get(item.getSecond()).add(item);
 				}
 			});
-			// Init max value chain	
+			// Init valid domino chain with highest value	
 			maxValueChain.setChain(new LinkedList<DominoItem>());
 			maxValueChain.getChain().add(initialDominoItem);
 			maxValueChain.setLeftMost(initialDominoItem.getFirst());
 			maxValueChain.setRightMost(initialDominoItem.getSecond());
 			maxValueChain.setValue(new Integer(0));
-			// Init current chain
-			currentChain = new ValidDominoChain();
-			currentChain.setChain(new LinkedList<DominoItem>());
-			currentChain.getChain().add(initialDominoItem);
-			currentChain.setLeftMost(initialDominoItem.getFirst());
-			currentChain.setRightMost(initialDominoItem.getSecond());
-			currentChain.setValue(new Integer(0)); 
+			// Init current valid domino chain
+			currentValidChain = new ValidDominoChain();
+			currentValidChain.setChain(new LinkedList<DominoItem>());
+			currentValidChain.getChain().add(initialDominoItem);
+			currentValidChain.setLeftMost(initialDominoItem.getFirst());
+			currentValidChain.setRightMost(initialDominoItem.getSecond());
+			currentValidChain.setValue(new Integer(0)); 
 			
-			calculateHighestValueChain(currentChain);
+			// Calculate valid domino chain with highest value recursively
+			calculateHighestValueChain(currentValidChain);
 			
+			// Set domino response
 			dominoResponse.setDominoChain(maxValueChain);
 		} catch (RuntimeException e) {
 			log.error(e.getMessage());
@@ -94,28 +104,29 @@ public class DominoServer implements DominoService {
 	}
 
 	private void calculateHighestValueChain(
-			ValidDominoChain currentChain) {
+			ValidDominoChain currentValidChain) {
+		// Mark end of the chain right side
 		boolean endChainRight;
+		// Mark end of the chain left side
 		boolean endChainLeft;
-		try {
-			
-			// Update right chain
-			endChainRight = updateRightChain(currentChain);
+		try {		
+			// Update current valid chain right side
+			endChainRight = updateRightChain(currentValidChain);
 					
-			// Update left chain
-			endChainLeft = updateLeftChain(currentChain);
+			// Update current valid chain left side
+			endChainLeft = updateLeftChain(currentValidChain);
 			
-			// Check if no more items can be added, neither to right nor to the left
+			// Check if no more items can be added, neither to the right side nor to the left side
 			if (endChainRight && endChainLeft) {
 				// If no more items can be added
-				// Update maxValueChain if current chain has a higher value than the previous one
-				if (currentChain.getValue() > maxValueChain.getValue()) {
+				// Update maxValueChain if current valid chain has a higher value
+				if (currentValidChain.getValue() > maxValueChain.getValue()) {
 					LinkedList<DominoItem> newLinkedList = 
-							(LinkedList<DominoItem>) currentChain.getChain().clone();
+							(LinkedList<DominoItem>) currentValidChain.getChain().clone();
 					maxValueChain.setChain(newLinkedList);
-					maxValueChain.setValue(currentChain.getValue());
-					maxValueChain.setLeftMost(currentChain.getLeftMost());
-					maxValueChain.setRightMost(currentChain.getRightMost());
+					maxValueChain.setValue(currentValidChain.getValue());
+					maxValueChain.setLeftMost(currentValidChain.getLeftMost());
+					maxValueChain.setRightMost(currentValidChain.getRightMost());
 				}
 			}			
 		} catch (RuntimeException e) {
@@ -124,40 +135,50 @@ public class DominoServer implements DominoService {
 		}
 	}
 
-	private Boolean updateLeftChain(ValidDominoChain currentChain) {
+	private Boolean updateLeftChain(ValidDominoChain currentValidChain) {
+		// endChain marks the left end of the current valid chain
+		// True if and only if no more items can be added to the left
 		Boolean endChain[] = new Boolean[1];
 		endChain[0] = true;
+		DominoItem item;
 		try {
-			map.get(currentChain.getLeftMost()).forEach(item -> {
-				if (!item.isUsed()) {
-					// Set end chain false
+			// Consider domino items associated to current valid chain left most value
+			Set<DominoItem> leftMostSet = dominoMap.get(currentValidChain.getLeftMost());
+			Iterator<DominoItem> iterator = leftMostSet.iterator();
+			while (iterator.hasNext()) {
+				// Get next item
+				item = iterator.next();
+				
+				// If item is not visited
+				if (!item.getVisited()) {
+					// Mark the left end of the current chain as false
 					endChain[0] = false;
 					
-					// Set current item as used
-					item.setUsed(true);
+					// Mark item as visited
+					item.setVisited(true);
 
-					// Update current chain by adding current item to the left
-					Integer leftMost = currentChain.getLeftMost();
-					currentChain.getChain().addFirst(item);
+					// Update current valid chain by adding current item to the left
+					Integer leftMost = currentValidChain.getLeftMost();
+					currentValidChain.getChain().addFirst(item);
 					Integer newLeftMostValue = 
 							(item.getFirst().equals(leftMost)) ? 
 									item.getSecond() : item.getFirst();
-					currentChain.setRightMost(newLeftMostValue);			
-					currentChain.setValue(currentChain.getValue() + 
+					currentValidChain.setRightMost(newLeftMostValue);			
+					currentValidChain.setValue(currentValidChain.getValue() + 
 							leftMost);
 					
-					// Recursive call
-					calculateHighestValueChain(currentChain);
+					// Recursive call with updated current valid chain
+					calculateHighestValueChain(currentValidChain);
 					
-					// Set current item as unused
-					item.setUsed(false);
+					// Mark item as not visited
+					item.setVisited(false);
 					
-					// Update back current chain by removing current item from the left
-					currentChain.getChain().removeFirst();
-					currentChain.setValue(leftMost);
-					currentChain.setValue(currentChain.getValue() - leftMost);
+					// Update back current valid chain by removing current item from the left
+					currentValidChain.getChain().removeFirst();
+					currentValidChain.setValue(leftMost);
+					currentValidChain.setValue(currentValidChain.getValue() - leftMost);
 				}
-			});
+			}
 		} catch (RuntimeException e) {
 			log.error(e.getMessage());
 			throw e;
@@ -165,42 +186,53 @@ public class DominoServer implements DominoService {
 		return endChain[0];
  	}
 
-	private Boolean updateRightChain(ValidDominoChain currentChain) {
+	private Boolean updateRightChain(ValidDominoChain currentValidChain) {
+		// endChain marks the right end of the current valid chain
+		// True if and only if no more items can be added to the right
 		Boolean endChain[] = new Boolean[1];
 		endChain[0] = true;
+		DominoItem item;
 		try {
-			map.get(currentChain.getRightMost()).forEach(item -> {
-				if (!item.isUsed()) {
-					// Set end chain false
+			// Consider domino items associated to current valid chain right most value
+			Set<DominoItem> rightMostSet = dominoMap.get(currentValidChain.getRightMost());
+			Iterator<DominoItem> iterator = rightMostSet.iterator();
+			while (iterator.hasNext()) {
+				// Get next item
+				item = iterator.next();
+				
+				// If item is not visited
+				if (!item.getVisited()) {
+					// Mark the right end of the current chain as false
 					endChain[0] = false;
 					
-					// Set current item as used
-					item.setUsed(true);		
+					// Mark item as visited
+					item.setVisited(true);
 					
-					// Update current chain by adding current item to the right
-					Integer rightMost = currentChain.getRightMost();
-					currentChain.getChain().addLast(item);
+					// Update current valid chain by adding current item to the right
+					Integer rightMost = currentValidChain.getRightMost();
+					currentValidChain.getChain().addLast(item);
 					Integer newRightMostValue = 
 							(item.getFirst().equals(rightMost)) ? 
 									item.getSecond() : item.getFirst();
-					currentChain.setRightMost(newRightMostValue);
-					currentChain.setValue(currentChain.getValue() + 
+					currentValidChain.setRightMost(newRightMostValue);
+					currentValidChain.setValue(currentValidChain.getValue() + 
 							rightMost);
 					
-					// Recursive call
-					calculateHighestValueChain(currentChain);
+					// Recursive call with updated current valid chain
+					calculateHighestValueChain(currentValidChain);
 					
-					// Set current item as unused
-					item.setUsed(false);
+					// Mark item as not visited
+					item.setVisited(false);
 					
-					// Update back current chain by removing current item from the right
-					currentChain.getChain().removeLast();
-					currentChain.setRightMost(rightMost);
-					currentChain.setValue(currentChain.getValue() - rightMost);
+					// Update back current valid chain by removing current item from the right
+					currentValidChain.getChain().removeLast();
+					currentValidChain.setRightMost(rightMost);
+					currentValidChain.setValue(currentValidChain.getValue() - rightMost);
 				}
-			});
+			}
 		} catch (RuntimeException e) {
 			log.error(e.getMessage());
+			e.printStackTrace();
 			throw e;
 		}
 		return endChain[0];

@@ -8,7 +8,7 @@ public class DominoItem {
 	private Integer second;
 	
 	@JsonIgnore
-	private boolean used;
+	private Boolean visited;
 
 	public Integer getFirst() {
 		return first;
@@ -26,12 +26,23 @@ public class DominoItem {
 		this.second = second;
 	}
 
-	public boolean isUsed() {
-		return used;
+	public Boolean getVisited() {
+		return visited;
 	}
 
-	public void setUsed(boolean used) {
-		this.used = used;
+	public void setVisited(Boolean visited) {
+		this.visited = visited;
+	}
+
+	public DominoItem(Integer first, Integer second) {
+		super();
+		this.first = first;
+		this.second = second;
+		this.visited = false;
+	}
+
+	public DominoItem() {
+		this.visited = false;
 	}
 
 	@Override
@@ -40,7 +51,7 @@ public class DominoItem {
 		int result = 1;
 		result = prime * result + ((first == null) ? 0 : first.hashCode());
 		result = prime * result + ((second == null) ? 0 : second.hashCode());
-		result = prime * result + (used ? 1231 : 1237);
+		result = prime * result + ((visited == null) ? 0 : visited.hashCode());
 		return result;
 	}
 
@@ -63,25 +74,19 @@ public class DominoItem {
 				return false;
 		} else if (!second.equals(other.second))
 			return false;
-		if (used != other.used)
+		if (visited == null) {
+			if (other.visited != null)
+				return false;
+		} else if (!visited.equals(other.visited))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "DominoItem [first=" + first + ", second=" + second + ", used=" + used + "]";
-	}
-
-	public DominoItem(Integer first, Integer second) {
-		super();
-		this.first = first;
-		this.second = second;
-		this.used = false;
-	}
-
-	public DominoItem() {
-		this.used = false;
+		return "DominoItem [first=" + first + ", second=" + second + ", visited=" + visited + "]";
 	}
 	
+	
+
 }
