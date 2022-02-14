@@ -1,4 +1,4 @@
-package net.smartkyc.demo.domino.webservice;
+package net.smartkyc.demo.domino;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

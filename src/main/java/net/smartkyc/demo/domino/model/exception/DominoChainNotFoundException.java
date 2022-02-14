@@ -1,4 +1,4 @@
-package net.smartkyc.demo.domino.exception;
+package net.smartkyc.demo.domino.model.exception;
 
 public class DominoChainNotFoundException extends Exception {
 	 

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package net.smartkyc.demo.domino.webservice;
 
 import org.junit.jupiter.api.Test;
@@ -22,3 +23,18 @@ class DominoWebserviceApplicationTests {
 	
 
 }
+=======
+package net.smartkyc.demo.domino.webservice;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class DominoWebserviceApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
+>>>>>>> b551fef860bb9f8bea8708cdfcd3d5cff7488bbc
