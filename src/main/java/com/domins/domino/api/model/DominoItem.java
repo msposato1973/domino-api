@@ -1,4 +1,4 @@
-package net.smartkyc.demo.domino.model;
+package com.domins.domino.api.model;
 
 import java.util.Objects;
 
@@ -20,10 +20,6 @@ public class DominoItem {
 	
 	public int getRight() {
 		return this.right;
-	}
-	
-	public boolean sameNumber() {
-	      return this.left == this.right;
 	}
 	
 	

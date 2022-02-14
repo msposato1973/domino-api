@@ -8,10 +8,10 @@
 		<version>2.6.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>net.smartkyc.demo</groupId>
+	<groupId>com.domins</groupId>
 	<artifactId>domino-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>domino-webservice</name>
+	<name>domino-api</name>
 	<description>Calculates the chain with the highest value that can be built starting from one of the pieces</description>
 	<properties>
 		<java.version>11</java.version>
